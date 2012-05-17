@@ -42,8 +42,7 @@ void sig_handler(int signum) {
 	exit(EXIT_FAILURE);
 }
 
-char* read_file(char *filename){
-
+char* read_file(char *filename) {
 	struct stat file_stat;	
 	stat(filename, &file_stat);
 	filesize = (long)file_stat.st_size; 
@@ -54,32 +53,27 @@ char* read_file(char *filename){
 		exit(EXIT_FAILURE);	
 	}		
 	char *contents = buffer;
-	free(buffer);	
-	
+	free(buffer);
 	return contents;
-
 }
 
-void write_file(char* contents){
-
-	if(write(archive, (void *) filesize, sizeof(int)) == -1 ) {
+void write_file(char* content) {
+	if(write(archive, (void *)filesize, sizeof(int))==-1) {
 		perror("write size");
 		exit(EXIT_FAILURE);	
 	}
-
-	if(write(archive, (void *) contents, strlen(contents)) == -1 ) {
-		perror("write contents");
+	if(write(archive, (void *)content, strlen(content))==-1) {
+		perror("write content");
 		exit(EXIT_FAILURE);	
 	}
-    		
 }
 
 int delete_older_from_archive() {
 	// TO DO
 }
 
-int add_in_archive() {
-	// TO DO
+int add_in_archive(char *filename) {
+	write_file(read_file(filename));
 }
 
 int file_is_modified(char *filename) {
@@ -144,13 +138,13 @@ void record_file(int delay, int number, char *filename, char *archivename) {
 			
 			if(files_in_archive<=number) {
 				// Ajout du fichier dans l'archive
-				add_in_archive();
+				add_in_archive(filename);
 			}
 			else {
 				// Suppression du premier fichier de l'archive
 				delete_older_from_archive();
 				// Ajout du fichier dans l'archive
-				add_in_archive();
+				add_in_archive(filename);
 			}
 			
 			// Liberation des locks

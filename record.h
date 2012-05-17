@@ -34,8 +34,9 @@ char* read_file(char *filename);
 
 /**
  * write_file - 
+ * @content:
  */
-void write_file();
+void write_file(char* content);
 
 /**
  * delete_older_from_archive - Supprime le fichier le plus ancien de l'archive.
@@ -51,7 +52,7 @@ int delete_older_from_archive();
  * @arg: Argument pour l'appel systeme ("-cf" ou "-uf").
  * @return: 1 si tout s'est bien passé, 0 s'il y a eu une erreur.
  */
-int add_in_archive();
+int add_in_archive(char *filename);
 
 /**
  * file_is_modified - Regarde si le fichier a ete modifie ou non.
