@@ -11,6 +11,9 @@
 #ifndef __EXTRACT_H__
 #define __EXTRACT_H__
 
+#define TRUE 1
+#define FALSE 0
+
 /**
  * sig_handler - Effectue une tache particuliere des qu'elle recoit un certain signal.
  * @signum: Numero du signal.
