@@ -22,6 +22,8 @@
 int files_in_archive=0;
 int last_modification;
 
+int filesize=0;
+
 int file;
 int archive;
 
@@ -40,25 +42,19 @@ void sig_handler(int signum) {
 	exit(EXIT_FAILURE);
 }
 
-char* read_file(char *filename){
-
+char* read_file(char *filename) {
 	struct stat file_stat;	
 	stat(filename, &file_stat);
-	int filesize; 
-	filesize = (long)file_stat.st_size; 
+	filesize=(long)file_stat.st_size; 
 	char *buffer;
-	buffer = (char*)malloc(sizeof(char)*filesize);
+	buffer=(char *)malloc(sizeof(char)*filesize);
 	read(file, *buffer, (size_t)filesize);
 	char *contents = buffer;
-	free(buffer);	
-	
+	free(buffer);
 	return contents;
-
 }
 
-void write_file(){
-
-
+void write_file() {
 
 }
 

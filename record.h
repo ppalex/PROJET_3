@@ -26,6 +26,18 @@
 void sig_handler(int signum);
 
 /**
+ * read_file - Effectue une tache particuliere des qu'elle recoit un certain signal.
+ * @filename: 
+ * @return: 
+ */
+char* read_file(char *filename);
+
+/**
+ * write_file - 
+ */
+void write_file();
+
+/**
  * delete_older_from_archive - Supprime le fichier le plus ancien de l'archive.
  * @achivename: "String" representant le nom de l'archive.
  * @return: 1 si tout s'est bien passé, 0 s'il y a eu une erreur.
