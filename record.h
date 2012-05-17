@@ -36,14 +36,14 @@ char* read_file(char *filename);
  * write_file - 
  * @content:
  */
-void write_file(char* content);
+void write_file(char *content);
 
 /**
  * delete_older_from_archive - Supprime le fichier le plus ancien de l'archive.
  * @achivename: "String" representant le nom de l'archive.
  * @return: 1 si tout s'est bien passé, 0 s'il y a eu une erreur.
  */
-void delete_older_from_archive();
+void delete_older_from_archive(char *archivename);
 
 /**
  * add_in_archive - Ajoute le fichier filename dans l'archive archivename.

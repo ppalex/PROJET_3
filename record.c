@@ -74,14 +74,59 @@ void write_file(char* content) {
 	}
 }
 
-void delete_older_from_archive() {
-	// TO DO
+void delete_older_from_archive(char *archivename) {
+	int temporary;
+	temporary=open("test.tmp", O_WRONLY|O_CREAT|O_EXCL|O_TRUNC, S_IRUSR|S_IWUSR);
+	if(temporary==-1) {
+		perror("create temporary file");
+		exit(EXIT_FAILURE);
+	}
+	
+	int i,err;
+	lseek(a, 0, SEEK_SET);
+	if(read(a, (void *)&i, sizeof(int)==-1)) {
+		perror("read int");
+		exit(EXIT_FAILURE);
+	}
+	lseek(a, i, SEEK_CUR);
+	while((err=read(a, (void *)&x, sizeof(int)))>0) {
+		if(err==-1) {
+			perror("read int");
+			exit(EXIT_FAILURE);
+		}
+		
+		char *buffer;
+		buffer=(char *)malloc(sizeof(char)*x);
+		if(buffer==NULL) {
+			free(buffer);
+			return NULL;
+		}
+		if(read(a, (void *)buffer, (size_t)x-1)==-1) {
+			perror("read content");
+			exit(EXIT_FAILURE);	
+		}
+		
+		if(write(temporary, (void *)&x, sizeof(int))==-1) {
+			perror("write size");
+			exit(EXIT_FAILURE);	
+		}
+		if(write(temporary, (void *)buffer, strlen(buffer))==-1) {
+			perror("write content");
+			exit(EXIT_FAILURE);	
+		}
+		
+		free(buffer);
+	}
+	close(temporary);
+	rename("test.tmp", archivename);
+	files_in_archive--;
 }
 
 void add_in_archive(char *filename) {
 	char *temp = read_file(filename);
 	write_file(temp);
 	free(temp);
+	files_in_archive++;
 }
 
 int file_is_modified(char *filename) {
@@ -93,14 +138,12 @@ int file_is_modified(char *filename) {
 	}
 
 	if(files_in_archive==0) {
-		files_in_archive++;
 		last_modification=(int)file_stat.st_mtime;
 		return TRUE;
 	}
 	
 	else {		
 		if((int)file_stat.st_mtime>last_modification) {
-			files_in_archive++;
 			last_modification=(int)file_stat.st_mtime;
 			return TRUE;
 		}
@@ -112,6 +155,7 @@ int file_is_modified(char *filename) {
 }
 
 void record_file(int delay, int number, char *filename, char *archivename) {
+	// Creation du fichier archive, s'il existe deja, il y aura une erreur
 	int fd;
 	fd=open(archivename, O_WRONLY|O_CREAT|O_EXCL|O_TRUNC, S_IRUSR|S_IWUSR);
 	if(fd==-1) {
@@ -126,7 +170,6 @@ void record_file(int delay, int number, char *filename, char *archivename) {
 			// Ouverture de l'archive et du fichier a surveiller
 			a=open(archivename,O_RDWR|O_APPEND);
 			f=open(filename, O_RDONLY);
-			
 			if(a==-1) {
 				perror("open archive");
 				exit(EXIT_FAILURE);
@@ -152,7 +195,7 @@ void record_file(int delay, int number, char *filename, char *archivename) {
 			}
 			else {
 				// Suppression du premier fichier de l'archive
-				delete_older_from_archive();
+				delete_older_from_archive(archivename);
 				// Ajout du fichier dans l'archive
 				add_in_archive(filename);
 			}
