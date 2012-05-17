@@ -125,8 +125,6 @@ void delete_older_from_archive(char *archivename) {
 			perror("write content");
 			exit(EXIT_FAILURE);	
 		}
-		
-		printf("%d:%s\n",x,buffer);
 		free(buffer);
 	}
 	close(temporary);

@@ -44,14 +44,19 @@ void extract_file(int indice, char *archivename) {
 		exit(EXIT_FAILURE);
 	}
 	
-	a = open(archivename, O_RDONLY);
+	// Ouverture de l'archive
+	a=open(archivename, O_RDONLY);
+	if(a==-1) {
+		perror("open archive");
+		exit(EXIT_FAILURE);
+	}
 	
 	// Lock de l'archive
 	if(flock(a,LOCK_EX)==-1) {
 		perror("flock - LOCK_EX");
 		exit(EXIT_FAILURE);
 	}
-	
+	int d = 0;
 	int i = 0;
 	while((err=read(a, (void *)&x, sizeof(int)))>0) {
 		if(err==-1) {
@@ -71,13 +76,28 @@ void extract_file(int indice, char *archivename) {
 		}
 		
 		if(i==indice) {
+			d=1;
 			if(write(temporary, (void *)buffer, strlen(buffer))==-1) {
 				perror("write content");
 				exit(EXIT_FAILURE);	
 			}
+			printf("%s\n",buffer);
+			free(buffer);
+			break;
 		}
 		free(buffer);
 		i++;
+
+	}
+	if(d==0) {
+		printf("File with indice %d doesn't exist in archive\n", indice);
+		unlink("README1");
+		if(close(a)==-1) {
+			perror("close archive");
+			exit(EXIT_FAILURE);
+		}
+		exit(EXIT_FAILURE);
+
 	}
 	
 	// Liberation du lock
