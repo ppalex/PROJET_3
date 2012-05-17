@@ -33,6 +33,7 @@ int files_in_archive=0;
 int last_modification;
 
 int filesize=0;
+char name[32];
 
 int a;
 int f;
@@ -86,13 +87,13 @@ void delete_older_from_archive(char *archivename) {
 
 	int i,err,x;
 	
-	lseek(a, 0, SEEK_SET);
+	lseek(a, 32, SEEK_SET);
 	if(read(a, (void *)&i, sizeof(int))==-1) {
 		perror("read int");
 		exit(EXIT_FAILURE);
 	}
 	
-	lseek(a, sizeof(i)+i-1, SEEK_SET);
+	lseek(a, 32+sizeof(i)+i-1, SEEK_SET);
 	
 	while((err=read(a, (void *)&x, sizeof(int)))>0) {
 		if(err==-1) {
@@ -166,6 +167,12 @@ void record_file(int delay, int number, char *filename, char *archivename) {
 	if(fd==-1) {
 		perror("create archive");
 		exit(EXIT_FAILURE);
+	}
+	name=filename;
+	printf("%d\n", strlen(name));
+	if(write(fd, (void *)name, strlen(name))==-1) {
+		perror("write name");
+		exit(EXIT_FAILURE);	
 	}
 	close(fd);
 
