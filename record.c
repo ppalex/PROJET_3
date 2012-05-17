@@ -17,6 +17,16 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <signal.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <string.h>
+#include <getopt.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <ctype.h>
+#include <sys/file.h>
 #include "record.h"
 
 int files_in_archive=0;
@@ -48,7 +58,7 @@ char* read_file(char *filename) {
 	filesize = (long)file_stat.st_size; 
 	char *buffer;
 	buffer = (char*)malloc(sizeof(char)*filesize);
-	if(read(file, *buffer, (size_t)filesize)==-1){
+	if(read(file, (void *)buffer, (size_t)filesize)==-1){
 		perror("read");
 		exit(EXIT_FAILURE);	
 	}		
@@ -68,11 +78,11 @@ void write_file(char* content) {
 	}
 }
 
-int delete_older_from_archive() {
+void delete_older_from_archive() {
 	// TO DO
 }
 
-int add_in_archive(char *filename) {
+void add_in_archive(char *filename) {
 	write_file(read_file(filename));
 }
 

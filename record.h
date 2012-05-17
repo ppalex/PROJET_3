@@ -43,7 +43,7 @@ void write_file(char* content);
  * @achivename: "String" representant le nom de l'archive.
  * @return: 1 si tout s'est bien passé, 0 s'il y a eu une erreur.
  */
-int delete_older_from_archive();
+void delete_older_from_archive();
 
 /**
  * add_in_archive - Ajoute le fichier filename dans l'archive archivename.
@@ -52,7 +52,7 @@ int delete_older_from_archive();
  * @arg: Argument pour l'appel systeme ("-cf" ou "-uf").
  * @return: 1 si tout s'est bien passé, 0 s'il y a eu une erreur.
  */
-int add_in_archive(char *filename);
+void add_in_archive(char *filename);
 
 /**
  * file_is_modified - Regarde si le fichier a ete modifie ou non.

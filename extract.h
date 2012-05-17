@@ -23,7 +23,7 @@ void sig_handler(int signum);
  * @archivename: Nom de l'archive.
  * @return: 1 si tout s'est bien passé, 0 s'il y a eu une erreur.
  */
-int extract_file(int i, char *archivename);
+void extract_file(int i, char *archivename);
 
 #endif
 

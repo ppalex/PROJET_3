@@ -9,9 +9,19 @@
  * Note : Les specifications n'ont pas ete recopiees.
  *
  */
-
+ 
 #include <stdlib.h>
 #include <stdio.h>
+#include <signal.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <string.h>
+#include <getopt.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <ctype.h>
+#include <sys/file.h>
 #include "extract.h"
 
 int archive;
@@ -27,9 +37,9 @@ void sig_handler(int signum) {
 	exit(EXIT_FAILURE);
 }
 
-int extract_file(int indice, char *archivename) {
+void extract_file(int indice, char *archivename) {
 	// TO DO
-	archive = open();
+	//archive = open();
 }
 
 int main(int argc, char *argv[]) {
