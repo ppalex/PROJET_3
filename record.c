@@ -37,12 +37,6 @@ int filesize=0;
 int a;
 int f;
 
-
-
-
-
-
-
 void sig_handler(int signum) {
 	signal(signum, SIG_IGN);
 	printf("\nGoodbye\n");
