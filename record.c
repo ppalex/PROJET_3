@@ -42,10 +42,10 @@ void sig_handler(int signum) {
 	exit(EXIT_FAILURE);
 }
 
-char* read_file(char *fileName){
+char* read_file(char *filename){
 
 	struct stat file_stat;	
-	stat(fileName, &file_stat);
+	stat(filename, &file_stat);
 	filesize = (long)file_stat.st_size; 
 	char *buffer;
 	buffer = (char*)malloc(sizeof(char)*filesize);
@@ -60,10 +60,15 @@ char* read_file(char *fileName){
 
 }
 
-void write_file(char *archiveName, char* contents){
+void write_file(char* contents){
+
+	if(write(archive, (void *) filesize, sizeof(int)) == -1 ) {
+		perror("write size");
+		exit(EXIT_FAILURE);	
+	}
 
 	if(write(archive, (void *) contents, strlen(contents)) == -1 ) {
-		perror("write");
+		perror("write contents");
 		exit(EXIT_FAILURE);	
 	}
     		
