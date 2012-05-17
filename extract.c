@@ -35,6 +35,7 @@ void sig_handler(int signum) {
 }
 
 void extract_file(int indice, char *archivename) {
+	int x,err;
 	printf("EXTRACT\n");
 	int temporary;
 	temporary=open("README1", O_WRONLY|O_CREAT|O_EXCL|O_APPEND, S_IRUSR|S_IWUSR);
@@ -55,7 +56,7 @@ void extract_file(int indice, char *archivename) {
 		perror("flock - LOCK_EX");
 		exit(EXIT_FAILURE);
 	}
-	
+	int d = 0;
 	int i = 0;
 	while((err=read(a, (void *)&x, sizeof(int)))>0) {
 		if(err==-1) {
@@ -75,15 +76,20 @@ void extract_file(int indice, char *archivename) {
 		}
 		
 		if(i==indice) {
+			d=1;
 			if(write(temporary, (void *)buffer, strlen(buffer))==-1) {
 				perror("write content");
 				exit(EXIT_FAILURE);	
 			}
+			printf("%s\n",buffer);
+			free(buffer);
+			break;
 		}
 		free(buffer);
 		i++;
+
 	}
-	if(i>indice) {
+	if(d==0) {
 		printf("File with indice %d doesn't exist in archive\n", indice);
 		unlink("README1");
 		if(close(a)==-1) {
@@ -91,6 +97,7 @@ void extract_file(int indice, char *archivename) {
 			exit(EXIT_FAILURE);
 		}
 		exit(EXIT_FAILURE);
+
 	}
 	
 	// Liberation du lock
