@@ -42,20 +42,31 @@ void sig_handler(int signum) {
 	exit(EXIT_FAILURE);
 }
 
-char* read_file(char *filename) {
+char* read_file(char *fileName){
+
 	struct stat file_stat;	
-	stat(filename, &file_stat);
-	filesize=(long)file_stat.st_size; 
+	stat(fileName, &file_stat);
+	filesize = (long)file_stat.st_size; 
 	char *buffer;
-	buffer=(char *)malloc(sizeof(char)*filesize);
-	read(file, *buffer, (size_t)filesize);
+	buffer = (char*)malloc(sizeof(char)*filesize);
+	if(read(file, *buffer, (size_t)filesize)==-1){
+		perror("read");
+		exit(EXIT_FAILURE);	
+	}		
 	char *contents = buffer;
-	free(buffer);
+	free(buffer);	
+	
 	return contents;
+
 }
 
-void write_file() {
+void write_file(char *archiveName, char* contents){
 
+	if(write(archive, (void *) contents, strlen(contents)) == -1 ) {
+		perror("write");
+		exit(EXIT_FAILURE);	
+	}
+    		
 }
 
 int delete_older_from_archive() {
