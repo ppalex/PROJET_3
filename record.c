@@ -52,7 +52,7 @@ char* read_file(char *filename) {
 	filesize=(long)file_stat.st_size; 
 	
 	char *buffer;
-	buffer=(char *)malloc(sizeof(char)*filesize);
+	buffer=(char *)malloc((sizeof(char)*filesize)-1);
 	if(buffer==NULL) {
 		free(buffer);
 		return NULL;
@@ -101,7 +101,7 @@ void delete_older_from_archive(char *archivename) {
 		}
 		
 		char *buffer;
-		buffer=(char *)malloc(sizeof(char)*x);
+		buffer=(char *)malloc((sizeof(char)*x)-1);
 		if(buffer==NULL) {
 			free(buffer);
 			exit(EXIT_FAILURE);
