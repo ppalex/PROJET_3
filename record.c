@@ -168,7 +168,7 @@ void record_file(int delay, int number, char *filename, char *archivename) {
 		perror("create archive");
 		exit(EXIT_FAILURE);
 	}
-	name=filename;
+	memcpy(name,filename,sizeof(name));
 	printf("%d\n", strlen(name));
 	if(write(fd, (void *)name, strlen(name))==-1) {
 		perror("write name");
@@ -271,22 +271,8 @@ int main(int argc, char *argv[]) {
 			archivename=argv[index];
 		}
 		
-		char *variable;
-		int len = snprintf(NULL, 0, "%s.fifo", filename);	
-		variable = malloc((len+1) * sizeof(char));
-		if(variable==NULL) {
-			free(variable);
-			exit(EXIT_FAILURE);
-		}	
-		snprintf(variable, len+1, "%s.fifo", filename);
 		
-		if (mkfifo((variable), S_IRWXU | S_IRGRP | S_IWGRP) == -1)
-		{
-			fprintf(stderr, "Erreur de création du tube");
-			exit(EXIT_FAILURE);
-		}
-		
-		// Traitement des signaux d'arret du programme
+	        // Traitement des signaux d'arret du programme
 		signal(SIGINT, sig_handler);
 		signal(SIGHUP, sig_handler);
 		signal(SIGQUIT, sig_handler);

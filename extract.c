@@ -36,18 +36,32 @@ void sig_handler(int signum) {
 
 void extract_file(int indice, char *archivename) {
 	int temporary;
-	temporary=open("README1", O_WRONLY|O_CREAT|O_EXCL|O_APPEND, S_IRUSR|S_IWUSR);
-	if(temporary==-1) {
-		perror("create temporary file");
+	char *name;
+	name=(char*)malloc(sizeof(char)*32);
+	if(name==NULL){
+		free(name);
 		exit(EXIT_FAILURE);
 	}
-	
 	// Ouverture de l'archive
 	a=open(archivename, O_RDONLY);
 	if(a==-1) {
 		perror("open archive");
 		exit(EXIT_FAILURE);
 	}
+	
+	if(read(a,(void*)name,(size_t)32)==-1){
+		perror("read name");
+	}
+	
+	
+	printf("%s\n",name);
+	temporary=open(name, O_WRONLY|O_CREAT|O_EXCL|O_APPEND, S_IRUSR|S_IWUSR);
+	if(temporary==-1) {
+		perror("create temporary file");
+		exit(EXIT_FAILURE);
+	}
+	
+
 	
 	// Lock de l'archive
 	if(flock(a,LOCK_EX)==-1) {
