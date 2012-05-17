@@ -124,7 +124,7 @@ void record_file(int delay, int number, char *filename, char *archivename) {
 	
 	else{*/
 	int fd;
-		fd=open(archivename,O_RDWR|O_CREAT,S_IRWXO);
+		fd=open(archivename,O_WRONLY|O_CREAT, S_IRUSR|S_IWUSR);
 		if(fd==-1) {
 				perror("open archive with rights");
 				exit(EXIT_FAILURE);
@@ -141,7 +141,7 @@ void record_file(int delay, int number, char *filename, char *archivename) {
 			int file;
 			int archive;
 			
-			archive=open(archivename, O_RDWR,S_IRWXO);
+			archive=open("test.dat",O_WRONLY|O_CREAT, S_IRUSR|S_IWUSR);
 			file=open(filename, O_RDONLY);
 			
 			if(archive==-1) {

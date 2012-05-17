@@ -115,22 +115,22 @@ int file_is_modified(char *filename) {
 }
 
 void record_file(int delay, int number, char *filename, char *archivename) {
-	FILE *test = fopen(archivename, "r");
+	/*FILE *test = fopen(archivename, "r");
 	if(test!=NULL){
 		printf("Archive already exist, please choose another name\n");
 		fclose(test);
 		exit(EXIT_FAILURE);
 	}
 	
-	else{
+	else{*/
 	int fd;
-		fd=open(archivename,O_RDWR|O_CREAT,S_IRWXO);
+		fd=open("test.dat",O_WRONLY|O_CREAT, S_IRUSR|S_IWUSR);
 		if(fd==-1) {
 				perror("open archive with rights");
 				exit(EXIT_FAILURE);
 			}
 		close(fd);
-	}
+	
 	
 	
 	
@@ -141,7 +141,7 @@ void record_file(int delay, int number, char *filename, char *archivename) {
 			int file;
 			int archive;
 			
-			archive=open(archivename, O_RDWR,S_IRWXO);
+			archive=open("test.dat",O_WRONLY|O_CREAT, S_IRUSR|S_IWUSR);
 			file=open(filename, O_RDONLY);
 			
 			if(archive==-1) {
