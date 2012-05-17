@@ -57,14 +57,17 @@ char* read_file(char *filename) {
 	stat(filename, &file_stat);
 	filesize = (long)file_stat.st_size; 
 	char *buffer;
-	buffer = (char*)malloc(sizeof(char)*filesize);
+	buffer = (char *)malloc(sizeof(char)*filesize);
+	if(buffer==NULL) {
+		free(buffer);
+		return NULL;
+	}
 	if(read(f, (void *)buffer, (size_t)filesize)==-1){
 		perror("read");
 		exit(EXIT_FAILURE);	
-	}		
-	char *content = buffer;
-	free(buffer);
-	return content;
+	}
+	printf("\n**** %s ****\n", buffer);
+	return buffer;
 }
 
 void write_file(char* content) {
@@ -76,8 +79,6 @@ void write_file(char* content) {
 		perror("write content");
 		exit(EXIT_FAILURE);	
 	}
-	printf("TEST\n");
-	
 }
 
 void delete_older_from_archive() {
@@ -117,18 +118,10 @@ int file_is_modified(char *filename) {
 }
 
 void record_file(int delay, int number, char *filename, char *archivename) {
-	/*FILE *test = fopen(archivename, "r");
-	if(test!=NULL){
-		printf("Archive already exist, please choose another name\n");
-		fclose(test);
-		exit(EXIT_FAILURE);
-	}
-	
-	else{*/
 	int fd;
-	fd=open(archivename,O_WRONLY|O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR);
+	fd=open(archivename, O_WRONLY|O_CREAT|O_EXCL|O_TRUNC, S_IRUSR|S_IWUSR);
 	if(fd==-1) {
-		perror("open archive with rights");
+		perror("create archive");
 		exit(EXIT_FAILURE);
 	}
 	close(fd);
@@ -137,24 +130,24 @@ void record_file(int delay, int number, char *filename, char *archivename) {
 	while(TRUE) {
 		if(file_is_modified(filename)) {
 			// Ouverture de l'archive et du fichier a surveiller
-			archive=open(archivename,O_WRONLY|O_CREAT, S_IRUSR|S_IWUSR);
-			file=open(filename, O_RDONLY);
+			a=open(archivename, O_RDWR, S_IRUSR|S_IWUSR);
+			f=open(filename, O_RDONLY);
 			
-			if(archive==-1) {
+			if(a==-1) {
 				perror("open archive");
 				exit(EXIT_FAILURE);
 			}
-			if(file==-1) {
+			if(f==-1) {
 				perror("open file");
 				exit(EXIT_FAILURE);
 			}
 			
 			// Lock des deux fichiers
-			if(flock(archive,LOCK_EX)==-1) {
+			if(flock(a,LOCK_EX)==-1) {
 				perror("flock - LOCK_EX");
 				exit(EXIT_FAILURE);
 			}
-			if(flock(file,LOCK_EX)==-1) {
+			if(flock(f,LOCK_EX)==-1) {
 				perror("flock - LOCK_EX");
 				exit(EXIT_FAILURE);
 			}
@@ -171,21 +164,21 @@ void record_file(int delay, int number, char *filename, char *archivename) {
 			}
 			
 			// Liberation des locks
-			if (flock(archive,LOCK_UN)==-1) {
+			if (flock(a,LOCK_UN)==-1) {
 				perror("flock - LOCK_UN");
 				exit(EXIT_FAILURE);
 			}
-			if (flock(file,LOCK_UN)==-1) {
+			if (flock(f,LOCK_UN)==-1) {
 				perror("flock - LOCK_UN");
 				exit(EXIT_FAILURE);
 			}
 			
 			// Fermeture des fichiers
-			if(close(archive)==-1) {
+			if(close(a)==-1) {
 				perror("close archive");
 				exit(EXIT_FAILURE);
 			}
-			if(close(file)==-1) {
+			if(close(f)==-1) {
 				perror("close file");
 				exit(EXIT_FAILURE);
 			}
@@ -242,7 +235,6 @@ int main(int argc, char *argv[]) {
 
 		return EXIT_SUCCESS;
 	}
-
 	else {
 		printf("Wrong number of arguments\n");
 		return EXIT_FAILURE;
