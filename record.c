@@ -125,7 +125,7 @@ void record_file(int delay, int number, char *filename, char *archivename) {
 	while(TRUE) {
 		if(file_is_modified(filename)) {
 			// Ouverture de l'archive et du fichier a surveiller
-			archive=open(archivename, O_RDWR);
+			archive=open(archivename, O_RDWR|O_CREAT);
 			file=open(filename, O_RDONLY);
 			if(archive==-1) {
 				perror("open");
