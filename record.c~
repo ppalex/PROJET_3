@@ -37,6 +37,34 @@ int filesize=0;
 int a;
 int f;
 
+
+#include <stdio.h>
+
+int fsize(const char * fname, long * ptr)
+{
+    /* Cette fonction retourne 0 en cas de succes, une valeur differente dans le cas contraire. */
+    /* La taille du fichier, si elle a pu etre calculee, est retournee dans *ptr                */
+    
+    FILE * f;
+    int ret = 0;
+    
+    f = fopen(fname, "rb");   
+    if (f != NULL)
+    {
+        fseek(f, 0, SEEK_END); /* aller a la fin du fichier */
+        *ptr = ftell(f); /* lire l'offset de la position courante par rapport au debut du fichier */
+        fclose(f);
+    }
+    else
+        ret = 1;
+    
+    return ret;
+}
+
+
+
+
+
 void sig_handler(int signum) {
 	signal(signum, SIG_IGN);
 	printf("\nGoodbye\n");
@@ -52,7 +80,7 @@ char* read_file(char *filename) {
 	filesize=(long)file_stat.st_size; 
 	
 	char *buffer;
-	buffer=(char *)malloc(sizeof(char)*filesize);
+	buffer=(char *)malloc((sizeof(char)*filesize)-1);
 	if(buffer==NULL) {
 		free(buffer);
 		return NULL;
@@ -105,7 +133,7 @@ void delete_older_from_archive(char *archivename) {
 		}
 		
 		char *buffer;
-		buffer=(char *)malloc(sizeof(char)*x);
+		buffer=(char *)malloc((sizeof(char)*x)-1);
 		if(buffer==NULL) {
 			free(buffer);
 			exit(EXIT_FAILURE);
@@ -115,7 +143,7 @@ void delete_older_from_archive(char *archivename) {
 			exit(EXIT_FAILURE);	
 		}
 		
-		if(write(temporary, (void *)&x, sizeof(int))==-1) {
+		if(write(temporary, &x, sizeof(int))==-1) {
 			perror("write size");
 			exit(EXIT_FAILURE);	
 		}

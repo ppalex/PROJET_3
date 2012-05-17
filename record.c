@@ -37,6 +37,12 @@ int filesize=0;
 int a;
 int f;
 
+
+
+
+
+
+
 void sig_handler(int signum) {
 	signal(signum, SIG_IGN);
 	printf("\nGoodbye\n");
@@ -52,7 +58,7 @@ char* read_file(char *filename) {
 	filesize=(long)file_stat.st_size; 
 	
 	char *buffer;
-	buffer=(char *)malloc(sizeof(char)*filesize);
+	buffer=(char *)malloc((sizeof(char)*filesize)-1);
 	if(buffer==NULL) {
 		free(buffer);
 		return NULL;
@@ -105,7 +111,7 @@ void delete_older_from_archive(char *archivename) {
 		}
 		
 		char *buffer;
-		buffer=(char *)malloc(sizeof(char)*x);
+		buffer=(char *)malloc((sizeof(char)*x)-1);
 		if(buffer==NULL) {
 			free(buffer);
 			exit(EXIT_FAILURE);
@@ -115,7 +121,7 @@ void delete_older_from_archive(char *archivename) {
 			exit(EXIT_FAILURE);	
 		}
 		
-		if(write(temporary, (void *)&x, sizeof(int))==-1) {
+		if(write(temporary, &x, sizeof(int))==-1) {
 			perror("write size");
 			exit(EXIT_FAILURE);	
 		}
