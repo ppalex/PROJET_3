@@ -269,6 +269,13 @@ int main(int argc, char *argv[]) {
 			index++;
 			archivename=argv[index];
 		}
+		
+		if (mkfifo((filename), S_IRWXU | S_IRGRP | S_IWGRP) == -1)
+		{
+			fprintf(stderr, "Erreur de création du tube");
+			exit(EXIT_FAILURE);
+		}
+
 
 		// Traitement des signaux d'arret du programme
 		signal(SIGINT, sig_handler);

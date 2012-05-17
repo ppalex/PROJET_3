@@ -38,28 +38,6 @@ int a;
 int f;
 
 
-#include <stdio.h>
-
-int fsize(const char * fname, long * ptr)
-{
-    /* Cette fonction retourne 0 en cas de succes, une valeur differente dans le cas contraire. */
-    /* La taille du fichier, si elle a pu etre calculee, est retournee dans *ptr                */
-    
-    FILE * f;
-    int ret = 0;
-    
-    f = fopen(fname, "rb");   
-    if (f != NULL)
-    {
-        fseek(f, 0, SEEK_END); /* aller a la fin du fichier */
-        *ptr = ftell(f); /* lire l'offset de la position courante par rapport au debut du fichier */
-        fclose(f);
-    }
-    else
-        ret = 1;
-    
-    return ret;
-}
 
 
 
@@ -104,7 +82,6 @@ void write_file(char* content) {
 }
 
 void delete_older_from_archive(char *archivename) {
-	off_t o;
 	printf("DELETE\n");
 	int temporary;
 	temporary=open("test.tmp", O_WRONLY|O_CREAT|O_EXCL|O_APPEND, S_IRUSR|S_IWUSR);
@@ -112,19 +89,16 @@ void delete_older_from_archive(char *archivename) {
 		perror("create temporary file");
 		exit(EXIT_FAILURE);
 	}
-	
+
 	int i,err,x;
 	
 	lseek(a, 0, SEEK_SET);
-	
 	if(read(a, (void *)&i, sizeof(int))==-1) {
 		perror("read int");
 		exit(EXIT_FAILURE);
 	}
 	
-	o=lseek(a, sizeof(i)+i-1, SEEK_SET);
-	
-	printf("%d\n",(int)o);
+	lseek(a, sizeof(i)+i-1, SEEK_SET);
 	
 	while((err=read(a, (void *)&x, sizeof(int)))>0) {
 		if(err==-1) {
@@ -151,8 +125,6 @@ void delete_older_from_archive(char *archivename) {
 			perror("write content");
 			exit(EXIT_FAILURE);	
 		}
-		
-		printf("%d:%s\n",x,buffer);
 		free(buffer);
 	}
 	close(temporary);
@@ -297,6 +269,13 @@ int main(int argc, char *argv[]) {
 			index++;
 			archivename=argv[index];
 		}
+		
+		if (mkfifo((archivename), S_IRWXU | S_IRGRP | S_IWGRP) == -1)
+		{
+			fprintf(stderr, "Erreur de création du tube");
+			exit(EXIT_FAILURE);
+		}
+
 
 		// Traitement des signaux d'arret du programme
 		signal(SIGINT, sig_handler);
