@@ -85,7 +85,7 @@ void extract_file(int indice, char *archivename) {
 	}
 	if(i>indice) {
 		printf("File with indice %d doesn't exist in archive\n", indice);
-		unlink(temporary);
+		unlink("README1");
 		if(close(a)==-1) {
 			perror("close archive");
 			exit(EXIT_FAILURE);
