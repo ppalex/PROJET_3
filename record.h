@@ -26,31 +26,27 @@
 void sig_handler(int signum);
 
 /**
- * read_file - Effectue une tache particuliere des qu'elle recoit un certain signal.
- * @filename: 
- * @return: 
+ * read_file - Lit et renvoie le contenu du fichier a surveiller.
+ * @filename: Fichier a surveiller.
+ * @return: Contenu de ce fichier.
  */
 char* read_file(char *filename);
 
 /**
- * write_file - 
- * @content:
+ * write_file - Ecrit la taille du contenu du fichier suivit du contenu du fichier dans l'archive.
+ * @content: Contenu du fichier a surveiller.
  */
 void write_file(char *content);
 
 /**
  * delete_older_from_archive - Supprime le fichier le plus ancien de l'archive.
- * @achivename: "String" representant le nom de l'archive.
- * @return: 1 si tout s'est bien passé, 0 s'il y a eu une erreur.
+ * @achivename: Nom de l'archive.
  */
 void delete_older_from_archive(char *archivename);
 
 /**
  * add_in_archive - Ajoute le fichier filename dans l'archive archivename.
  * @filename: Nom du fichier a ajouter.
- * @archivename: Nom de l'archive dans laquelle on doit ajouter le fichier.
- * @arg: Argument pour l'appel systeme ("-cf" ou "-uf").
- * @return: 1 si tout s'est bien passé, 0 s'il y a eu une erreur.
  */
 void add_in_archive(char *filename);
 

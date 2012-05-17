@@ -50,6 +50,7 @@ char* read_file(char *filename) {
 	struct stat file_stat;	
 	stat(filename, &file_stat);
 	filesize=(long)file_stat.st_size; 
+	
 	char *buffer;
 	buffer=(char *)malloc(sizeof(char)*filesize);
 	if(buffer==NULL) {
@@ -64,7 +65,7 @@ char* read_file(char *filename) {
 }
 
 void write_file(char* content) {
-	if(write(a, (void *)&filesize, sizeof(int))==-1) {
+	if(write(a, &filesize, sizeof(int))==-1) {
 		perror("write size");
 		exit(EXIT_FAILURE);	
 	}
@@ -77,19 +78,21 @@ void write_file(char* content) {
 void delete_older_from_archive(char *archivename) {
 	printf("DELETE\n");
 	int temporary;
-	temporary=open("test.tmp", O_WRONLY|O_CREAT|O_EXCL|O_TRUNC, S_IRUSR|S_IWUSR);
+	temporary=open("test.tmp", O_WRONLY|O_CREAT|O_EXCL|O_APPEND, S_IRUSR|S_IWUSR);
 	if(temporary==-1) {
 		perror("create temporary file");
 		exit(EXIT_FAILURE);
 	}
+
+	int i,err,x;
 	
-	int i, err, x;
 	lseek(a, 0, SEEK_SET);
 	if(read(a, (void *)&i, sizeof(int))==-1) {
 		perror("read int");
 		exit(EXIT_FAILURE);
 	}
-	lseek(a, i, SEEK_CUR);
+	
+	lseek(a, sizeof(i)+i-1, SEEK_SET);
 	
 	while((err=read(a, (void *)&x, sizeof(int)))>0) {
 		if(err==-1) {
@@ -117,6 +120,7 @@ void delete_older_from_archive(char *archivename) {
 			exit(EXIT_FAILURE);	
 		}
 		
+		printf("%d:%s\n",x,buffer);
 		free(buffer);
 	}
 	close(temporary);
@@ -192,15 +196,15 @@ void record_file(int delay, int number, char *filename, char *archivename) {
 				exit(EXIT_FAILURE);
 			}
 			
-			if(files_in_archive<=number) {
+			if(files_in_archive<number) {
 				// Ajout du fichier dans l'archive
 				add_in_archive(filename);
 			}
 			else {
-				// Suppression du premier fichier de l'archive
-				delete_older_from_archive(archivename);
 				// Ajout du fichier dans l'archive
 				add_in_archive(filename);
+				// Suppression du premier fichier de l'archive
+				delete_older_from_archive(archivename);
 			}
 			
 			// Liberation des locks
