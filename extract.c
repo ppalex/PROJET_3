@@ -24,22 +24,77 @@
 #include <sys/file.h>
 #include "extract.h"
 
-int archive;
+int a;
 
 void sig_handler(int signum) {
 	signal(signum, SIG_IGN);
-	printf("\n***END***\n");
+	printf("\nGoodbye\n");
 	// Fermeture du fichier archive
-	if(close(archive)==-1) {
-		perror("close");
-		exit(EXIT_FAILURE);
-	}
+	close(a);
 	exit(EXIT_FAILURE);
 }
 
 void extract_file(int indice, char *archivename) {
-	// TO DO
-	//archive = open();
+	int x,err;
+	printf("EXTRACT\n");
+	int temporary;
+	temporary=open("README1", O_WRONLY|O_CREAT|O_EXCL|O_APPEND, S_IRUSR|S_IWUSR);
+	if(temporary==-1) {
+		perror("create temporary file");
+		exit(EXIT_FAILURE);
+	}
+	
+	a = open(archivename, O_RDONLY);
+	
+	// Lock de l'archive
+	if(flock(a,LOCK_EX)==-1) {
+		perror("flock - LOCK_EX");
+		exit(EXIT_FAILURE);
+	}
+	
+	int i = 0;
+	while((err=read(a, (void *)&x, sizeof(int)))>0) {
+		if(err==-1) {
+			perror("read int");
+			exit(EXIT_FAILURE);
+		}
+		
+		char *buffer;
+		buffer=(char *)malloc((sizeof(char)*x)-1);
+		if(buffer==NULL) {
+			free(buffer);
+			exit(EXIT_FAILURE);
+		}
+		if(read(a, (void *)buffer, (size_t)x-1)==-1) {
+			perror("read content");
+			exit(EXIT_FAILURE);	
+		}
+		
+		if(i==indice) {
+			if(write(temporary, (void *)buffer, strlen(buffer))==-1) {
+				perror("write content");
+				exit(EXIT_FAILURE);	
+			}
+		}
+		free(buffer);
+		i++;
+	}
+	
+	// Liberation du lock
+	if (flock(a,LOCK_UN)==-1) {
+		perror("flock - LOCK_UN");
+		exit(EXIT_FAILURE);
+	}
+	
+	// Fermeture des fichiers
+	if(close(a)==-1) {
+		perror("close archive");
+		exit(EXIT_FAILURE);
+	}
+	if(close(temporary)==-1) {
+		perror("close temporary");
+		exit(EXIT_FAILURE);
+	}
 }
 
 int main(int argc, char *argv[]) {

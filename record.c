@@ -82,7 +82,6 @@ void write_file(char* content) {
 }
 
 void delete_older_from_archive(char *archivename) {
-	off_t o;
 	printf("DELETE\n");
 	int temporary;
 	temporary=open("test.tmp", O_WRONLY|O_CREAT|O_EXCL|O_APPEND, S_IRUSR|S_IWUSR);
@@ -90,19 +89,16 @@ void delete_older_from_archive(char *archivename) {
 		perror("create temporary file");
 		exit(EXIT_FAILURE);
 	}
-	
+
 	int i,err,x;
 	
 	lseek(a, 0, SEEK_SET);
-	
 	if(read(a, (void *)&i, sizeof(int))==-1) {
 		perror("read int");
 		exit(EXIT_FAILURE);
 	}
 	
-	o=lseek(a, sizeof(i)+i-1, SEEK_SET);
-	
-	printf("%d\n",(int)o);
+	lseek(a, sizeof(i)+i-1, SEEK_SET);
 	
 	while((err=read(a, (void *)&x, sizeof(int)))>0) {
 		if(err==-1) {

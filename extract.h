@@ -21,7 +21,6 @@ void sig_handler(int signum);
  * extract_file - Extrait le fichier d'indice i de l'archive archivename.
  * @i: Indice du fichier a recuperer.
  * @archivename: Nom de l'archive.
- * @return: 1 si tout s'est bien passé, 0 s'il y a eu une erreur.
  */
 void extract_file(int i, char *archivename);
 
