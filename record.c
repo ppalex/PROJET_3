@@ -41,14 +41,8 @@ void sig_handler(int signum) {
 	signal(signum, SIG_IGN);
 	printf("\n***END***\n");
 	// Fermeture des fichiers
-	if(close(a)==-1) {
-		perror("close");
-		exit(EXIT_FAILURE);
-	}
-	if(close(f)==-1) {
-		perror("close");
-		exit(EXIT_FAILURE);
-	}
+	close(a);
+	close(f);
 	exit(EXIT_FAILURE);
 }
 
@@ -89,6 +83,7 @@ void delete_older_from_archive() {
 void add_in_archive(char *filename) {
 	char *temp = read_file(filename);
 	write_file(temp);
+	free(temp);
 }
 
 int file_is_modified(char *filename) {

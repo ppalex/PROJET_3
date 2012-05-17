@@ -72,7 +72,7 @@ char* read_file(char *filename) {
 
 void write_file(char* content) {
 
-	if(write(a, (void *)filesize, sizeof(int))==-1) {
+	if(write(a, (void *)&filesize, sizeof(int))==-1) {
 		perror("write size");
 		exit(EXIT_FAILURE);	
 	}
@@ -89,6 +89,7 @@ void delete_older_from_archive() {
 void add_in_archive(char *filename) {
 	char *temp = read_file(filename);
 	write_file(temp);
+	free(temp);
 }
 
 int file_is_modified(char *filename) {
