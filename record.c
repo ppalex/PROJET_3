@@ -39,42 +39,35 @@ int f;
 
 void sig_handler(int signum) {
 	signal(signum, SIG_IGN);
-	printf("\n***END***\n");
+	printf("\nGoodbye\n");
 	// Fermeture des fichiers
-	if(close(a)==-1) {
-		perror("close");
-		exit(EXIT_FAILURE);
-	}
-	if(close(f)==-1) {
-		perror("close");
-		exit(EXIT_FAILURE);
-	}
+	close(a);
+	close(f);
 	exit(EXIT_FAILURE);
 }
 
 char* read_file(char *filename) {
 	struct stat file_stat;	
 	stat(filename, &file_stat);
-	filesize = (long)file_stat.st_size; 
+	filesize=(long)file_stat.st_size; 
 	char *buffer;
-	buffer = (char *)malloc(sizeof(char)*filesize);
+	buffer=(char *)malloc(sizeof(char)*filesize);
 	if(buffer==NULL) {
 		free(buffer);
 		return NULL;
 	}
-	if(read(f, (void *)buffer, (size_t)filesize)==-1){
+	if(read(f, (void *)buffer, (size_t)filesize-1)==-1) {
 		perror("read");
 		exit(EXIT_FAILURE);	
 	}
-	printf("\n**** %s ****\n", buffer);
 	return buffer;
 }
 
 void write_file(char* content) {
-	/*if(write(a, (void *)filesize, sizeof(int))==-1) {
+	if(write(a, (void *)&filesize, sizeof(int))==-1) {
 		perror("write size");
 		exit(EXIT_FAILURE);	
-	}*/
+	}
 	if(write(a, (void *)content, strlen(content))==-1) {
 		perror("write content");
 		exit(EXIT_FAILURE);	
@@ -88,6 +81,7 @@ void delete_older_from_archive() {
 void add_in_archive(char *filename) {
 	char *temp = read_file(filename);
 	write_file(temp);
+	free(temp);
 }
 
 int file_is_modified(char *filename) {
@@ -130,7 +124,7 @@ void record_file(int delay, int number, char *filename, char *archivename) {
 	while(TRUE) {
 		if(file_is_modified(filename)) {
 			// Ouverture de l'archive et du fichier a surveiller
-			a=open(archivename, O_RDWR);
+			a=open(archivename,O_RDWR|O_APPEND);
 			f=open(filename, O_RDONLY);
 			
 			if(a==-1) {
@@ -186,7 +180,6 @@ void record_file(int delay, int number, char *filename, char *archivename) {
 		sleep(delay);
 	}
 }
-
 
 int main(int argc, char *argv[]) {
 	if(argc==5 || argc==7) {
