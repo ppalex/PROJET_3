@@ -50,6 +50,7 @@ char* read_file(char *filename) {
 	struct stat file_stat;	
 	stat(filename, &file_stat);
 	filesize=(long)file_stat.st_size; 
+	
 	char *buffer;
 	buffer=(char *)malloc(sizeof(char)*filesize);
 	if(buffer==NULL) {
@@ -64,7 +65,7 @@ char* read_file(char *filename) {
 }
 
 void write_file(char* content) {
-	if(write(a, (void *)&filesize, sizeof(int))==-1) {
+	if(write(a, &filesize, sizeof(int))==-1) {
 		perror("write size");
 		exit(EXIT_FAILURE);	
 	}
@@ -75,20 +76,28 @@ void write_file(char* content) {
 }
 
 void delete_older_from_archive(char *archivename) {
+	off_t o;
+	printf("DELETE\n");
 	int temporary;
-	temporary=open("test.tmp", O_WRONLY|O_CREAT|O_EXCL|O_TRUNC, S_IRUSR|S_IWUSR);
+	temporary=open("test.tmp", O_WRONLY|O_CREAT|O_EXCL|O_APPEND, S_IRUSR|S_IWUSR);
 	if(temporary==-1) {
 		perror("create temporary file");
 		exit(EXIT_FAILURE);
 	}
 	
-	int i,err;
+	int i,err,x;
+	
 	lseek(a, 0, SEEK_SET);
-	if(read(a, (void *)&i, sizeof(int)==-1)) {
+	
+	if(read(a, (void *)&i, sizeof(int))==-1) {
 		perror("read int");
 		exit(EXIT_FAILURE);
 	}
-	lseek(a, i, SEEK_CUR);
+	
+	o=lseek(a, sizeof(i)+i-1, SEEK_SET);
+	
+	printf("%d\n",(int)o);
+	
 	while((err=read(a, (void *)&x, sizeof(int)))>0) {
 		if(err==-1) {
 			perror("read int");
@@ -99,7 +108,7 @@ void delete_older_from_archive(char *archivename) {
 		buffer=(char *)malloc(sizeof(char)*x);
 		if(buffer==NULL) {
 			free(buffer);
-			return NULL;
+			exit(EXIT_FAILURE);
 		}
 		if(read(a, (void *)buffer, (size_t)x-1)==-1) {
 			perror("read content");
@@ -115,6 +124,7 @@ void delete_older_from_archive(char *archivename) {
 			exit(EXIT_FAILURE);	
 		}
 		
+		printf("%d:%s\n",x,buffer);
 		free(buffer);
 	}
 	close(temporary);
@@ -123,6 +133,7 @@ void delete_older_from_archive(char *archivename) {
 }
 
 void add_in_archive(char *filename) {
+	printf("ADD\n");
 	char *temp = read_file(filename);
 	write_file(temp);
 	free(temp);
@@ -189,15 +200,15 @@ void record_file(int delay, int number, char *filename, char *archivename) {
 				exit(EXIT_FAILURE);
 			}
 			
-			if(files_in_archive<=number) {
+			if(files_in_archive<number) {
 				// Ajout du fichier dans l'archive
 				add_in_archive(filename);
 			}
 			else {
-				// Suppression du premier fichier de l'archive
-				delete_older_from_archive(archivename);
 				// Ajout du fichier dans l'archive
 				add_in_archive(filename);
+				// Suppression du premier fichier de l'archive
+				delete_older_from_archive(archivename);
 			}
 			
 			// Liberation des locks
